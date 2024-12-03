@@ -44,6 +44,12 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    mobile: {
+      type: String,
+      required: false,
+      trim: true,
+      minlength: 10,
+    },
   },
   {
     timestamps: true,

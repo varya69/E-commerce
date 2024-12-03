@@ -14,6 +14,7 @@ const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
+const sendResponseMiddleware = require('./middlewares/response.middleware');
 
 const app = express();
 
@@ -57,6 +58,9 @@ if (config.env === 'development') {
 // if (config.env === 'production') {
 //   app.use('/main/auth', authLimiter);
 // }
+
+// Use the middleware globally
+app.use(sendResponseMiddleware);
 
 // v1 api routes
 app.use('/main', routes);
