@@ -82,6 +82,11 @@ const ProductSchema = mongoose.Schema(
   }
 );
 
+// Add a virtual field to check if the product is wishlisted
+// ProductSchema.virtual('wishlisted').get(function () {
+//   return this.wishlists && this.wishlists.length > 0;  // Assuming 'wishlists' contains the user reference
+// });
+
 // add plugin that converts mongoose to json
 ProductSchema.plugin(toJSON);
 ProductSchema.plugin(paginate);

@@ -3,6 +3,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
+const { ref } = require('joi');
 
 const userSchema = mongoose.Schema(
   {
@@ -50,6 +51,12 @@ const userSchema = mongoose.Schema(
       trim: true,
       minlength: 10,
     },
+    // wishlist: [
+    //   { type: mongoose.SchemaTypes.ObjectId,
+    //     ref: 'Products',
+    //     // required: true,
+    //   }
+    // ]
   },
   {
     timestamps: true,

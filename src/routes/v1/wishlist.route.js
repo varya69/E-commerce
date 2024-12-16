@@ -6,9 +6,8 @@ const auth = require('../../middlewares/auth');
 
 const router = express.Router();
 
-router
-  .route('/')
-  .post(auth(), validate(wishlistValidation.addToWishlist), wishlistController.add)
-  .delete(auth(), validate(wishlistValidation.removeFromWishlist), wishlistController.remove);
+router.get('/getAllWishlist/:userId?', auth(), validate(wishlistValidation.getAll), wishlistController.getAll);
+router.delete('/:wishlistId?', auth(), validate(wishlistValidation.removeFromWishlist), wishlistController.remove);
+router.route('/').post(auth(), validate(wishlistValidation.addToWishlist), wishlistController.add)
 
 module.exports = router;

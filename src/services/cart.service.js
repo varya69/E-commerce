@@ -1,4 +1,8 @@
+const httpStatus = require('http-status');
+const ApiError = require('../utils/ApiError');
+const db = require('../models/index');
 const Cart = require('../models/cart.model');
+const Product = require('../models/products.model');
 
 // const addToCart = async (userId, productId, quantity = 1) => {
 //   let cart = await Cart.findOne({ userId });
@@ -36,50 +40,67 @@ const Cart = require('../models/cart.model');
 //   return cart;
 // };
 const add = async (userId, productId, quantity) => {
-  let cart = await Cart.findOne({ userId });
-  if (!cart) {
-    cart = new Cart({ userId, products: [] });
+  const product = await Product.findById(productId);
+  if (!product) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Product does not exist');
   }
 
-  const existingProduct = cart.products.find((p) => p.productId.toString() === productId);
-  if (existingProduct) {
+  let cart = await Cart.findOne({ userId, productId });
+  if (cart) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Product already in cart');
   }
+  
+  cart = new Cart({ userId, productId, quantity });
+  // const existingProduct = cart.products.find((p) => p.productId.toString() === productId);
+  // if (existingProduct) {
+  // }
 
-  cart.products.push({ productId, quantity });
+  // cart.products.push({ productId, quantity });
   await cart.save();
   return cart;
 };
 
-const update = async (userId, productId, quantity) => {
-  const cart = await Cart.findOne({ userId });
+const update = async (cartId, quantity) => {
+  if (!cartId) {
+    throw new Error("Cart ID is required");
+  }
+  const cart = await Cart.findOne({ _id: cartId });
   if (!cart) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Cart not found');
   }
 
-  const product = cart.products.find((p) => p.productId.toString() === productId);
-  if (!product) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found in cart');
-  }
-
-  product.quantity = quantity;
+  cart.quantity = quantity;
   await cart.save();
   return cart;
 };
 
-const remove = async (userId, productId) => {
-  const cart = await Cart.findOne({ userId });
+const remove = async (cartId, productId) => {
+  if (!cartId) {
+    throw new Error("Cart ID is required");
+  }
+  const cart = await Cart.deleteOne({ _id: cartId });
   if (!cart) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Cart not found');
   }
-
-  cart.products = cart.products.filter((p) => p.productId.toString() !== productId);
-  await cart.save();
   return cart;
 };
 
-const getCart = async (userId) => {
-  return await Cart.findOne({ userId }).populate('items.productId');
+const getAll = async (userId, options) => {
+  // return await Cart.findOne({ userId }).populate('items.productId');
+
+  const result = await Cart.paginate(
+    { userId }, // Filter by userId
+    {
+      ...options,
+      populate: {
+        path: 'productId', // Populate the products
+        // select: '-__v', // Optionally exclude some fields from the products
+      },
+    }
+  );
+
+  console.log('Carts fetched:', result);
+  return result;
 };
 
-module.exports = { add, remove, update, getCart };
+module.exports = { add, remove, update, getAll };

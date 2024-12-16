@@ -6,13 +6,13 @@ const auth = require('../../middlewares/auth');
 
 const router = express.Router();
 
-router
-  .route('/')
-  .post(auth(), validate(cartValidation.addToCart), cartController.add)
-  .get(auth(), cartController.get);
+router.get('/getAllCarts/:userId?', auth(), validate(cartValidation.getAll), cartController.getAll);
+
+router.route('/').post(auth(), validate(cartValidation.addToCart), cartController.add)
+  // .get(auth(), cartController.get);
 
 router
-  .delete('/', auth(), validate(cartValidation.removeFromCart), cartController.remove)
-  .patch('/', auth(), validate(cartValidation.updateCart), cartController.update);
+  .delete('/:cartId', auth(), validate(cartValidation.removeFromCart), cartController.remove)
+  .patch('/:cartId', auth(), validate(cartValidation.updateCart), cartController.update);
 
 module.exports = router;
