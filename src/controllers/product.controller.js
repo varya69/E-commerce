@@ -3,8 +3,16 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const productService = require('../services/product.service');
+const wishlistService = require('../services/wishlist.service');
+const db = require('../models/index');
+
 
 const create = catchAsync(async (req, res) => {
+  const user = await db.User.findById(req.body.userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'user not found');
+  }
+
   const result = await productService.create(req.params.userId, req.body);
   console.log('Product created Response: ', result);
   res.sendResponse(result, 'Product Created Successfully!', httpStatus.CREATED);
@@ -18,19 +26,86 @@ const update = catchAsync(async (req, res) => {
 const getAll = catchAsync(async (req, res) => {
   // Conditionally add userId to the filter
   const filter = req.params.userId ? { userId: req.params.userId } : {};
-  console.log('filter user data', req.user);
+
   const options = {
     sortBy: req.query.sortBy || 'createdAt:desc', // Default to createdAt descending
     limit: parseInt(req.query.limit, 10) || 10, // Default to 10 results per page
     page: parseInt(req.query.page, 10) || 1, // Default to the first page
   };
+  
+  const products = await productService.getAll(filter, options);
+  
+  const userId = filter.userId;
+  if(userId){
+    const wishlist = await wishlistService.getAll(req.params.userId);
+    if(wishlist.results.length > 0){
+      const wishlistedProductIds = wishlist.results.map((item) => {
+        return item.productId._id.toString();
+      }); // Extract product IDs from wishlist
+      
+      // Add `isWishlisted` flag to each product
+      products.results = products.results.map((product) => ({
+        ...product.toObject(), // Convert Mongoose object to plain JS object
+        isWishlisted: wishlistedProductIds.includes(product._id.toString()), // Check if product is in the wishlist
+      }));
+    }
+  } 
 
-  const result = await productService.getAll(filter, options);
-  // const products = await productService.getProductsWithWishlistStatus(req.params.userId, options);
+  // Build the aggregation pipeline
+  // const pipeline = [
+  //   {
+  //     $lookup: {
+  //       from: "wishlists", // The name of your Wishlist collection
+  //       localField: "_id", // Product `_id` field
+  //       foreignField: "productId", // Wishlist's `productId` field
+  //       as: "wishlistInfo", // Resulting field in the Product
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       isWishlisted: {
+  //         $cond: {
+  //           if: {
+  //             $gt: [
+  //               {
+  //                 $size: {
+  //                   $filter: {
+  //                     input: "$wishlistInfo", // Check if the product exists in the wishlist
+  //                     as: "wishlist",
+  //                     cond: { $eq: ["$$wishlist.userId", userId] },
+  //                   },
+  //                 },
+  //               },
+  //               0,
+  //             ],
+  //           },
+  //           then: true,
+  //           else: false,
+  //         },
+  //       },
+  //     },
+  //   },
+  //   {
+  //     $project: {
+  //       wishlistInfo: 0, // Exclude the detailed wishlist info
+  //     },
+  //   },
+  //   {
+  //     $sort: { [sortBy || "createdAt"]: -1 }, // Sort by sortBy param or default to `createdAt`
+  //   },
+  //   {
+  //     $skip: (pageValue - 1) * limitValue, // Pagination: skip
+  //   },
+  //   {
+  //     $limit: limitValue, // Pagination: limit
+  //   },
+  // ];
 
-  console.log('controller product get all response', result);
-  // const result = await productService.getAll(options);
-  res.sendResponse(result, 'Fetched Successfully', httpStatus.OK);
+  // Execute the aggregation
+  // const products = await db.Product.aggregate(pipeline);
+
+  // console.log('controller product get all response', products );
+  res.sendResponse(products , 'Fetched Successfully', httpStatus.OK);
 });
 
 const getById = catchAsync(async (req, res) => {

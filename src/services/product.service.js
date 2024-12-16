@@ -3,6 +3,7 @@ const logger = require('../config/logger');
 const { User, Product, Wishlist } = require('../models');
 const ApiError = require('../utils/ApiError');
 const db = require('../models/index');
+const wishlistService = require('../services/wishlist.service');
 
 /**
  * Create a user
@@ -30,11 +31,6 @@ const update = async (productId, updateBody) => {
 //     return await Product.paginate( options)
 // };
 const getAll = async (filter, options) => {
-  // Fetch products and populate the 'wishlisted' flag dynamically
-  // const products = await Product.find({}).populate('wishlisted');  // `wishlisted` is a virtual field
-  // return products;
-  
-  // return await Product.paginate(filter, options);
   return await db.Product.paginate(filter, options);
 };
 

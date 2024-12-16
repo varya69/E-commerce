@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError'); // Update the path as per your folder structure
 const Wishlist = require('../models/wishlist.model');
 const Product = require('../models/products.model');
+const db = require('../models/index');
 
 const add = async (userId, productId) => {
   const product = await Product.findById(productId);

@@ -2,6 +2,8 @@ const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError'); // Update the path as per your folder structure
 const wishlistService = require('../services/wishlist.service');
 const mongoose = require('mongoose');
+const db = require('../models/index');
+
 const catchAsync = require('../utils/catchAsync'); // Update the path as per your project structure
 
 // const add = catchAsync(async (req, res) => {
@@ -51,7 +53,7 @@ const getAll = catchAsync(async (req, res) => {
   };
 
   // const result = await wishlistService.getWishlist(req.params.userId, options);
-  const result = await wishlistService.getWishlist(req.user.id, options);
+  const result = await wishlistService.getAll(req.user.id, options);
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Wishlist not found');
   }
