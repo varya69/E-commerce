@@ -1,5 +1,6 @@
-const Order = require('../models/order.model');
-const Profile = require('../models/profile.model');
+const httpStatus = require('http-status');
+const { Order, Profile } = require('../models');
+const ApiError = require('../utils/ApiError');
 
 const createOrder = async (userId, orderData) => {
   const order = await Order.create({ userId, ...orderData });
@@ -15,14 +16,16 @@ const createOrder = async (userId, orderData) => {
 
 const getOrders = async (userId) => {
   const orders = await Order.find({ userId }).populate('orderItems.productId');
+  if (!order) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Order not found');
+  }
   return orders;
 };
 
 const getOrderById = async (orderId) => {
-  console.log("order ID: ", orderId)
   const order = await Order.findById(orderId).populate('orderItems.productId');
   if (!order) {
-    throw new Error('Order not found');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Order not found');
   }
   console.log("order Data: ", order)
   return order;

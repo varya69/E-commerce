@@ -1,6 +1,7 @@
 const orderService = require('../services/order.service');
 const catchAsync = require('../utils/catchAsync');
 const db = require('../models/index');
+const ApiError = require('../utils/ApiError');
 
 const createOrder = catchAsync(async (req, res) => {
   const userId = req.params.userId || req.user.id || '';

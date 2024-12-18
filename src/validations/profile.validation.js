@@ -3,8 +3,8 @@ const { objectId } = require('./custom.validation'); // Assuming you have a cust
 
 const createOrUpdate = {
   params: Joi.object().keys({
-      userId: Joi.string().required().length(24).hex(),
-    }),
+    userId: Joi.string().required().length(24).hex(),
+  }),
   body: Joi.object({
     name: Joi.string().required(),
     mobile: Joi.string().length(10).optional(),
@@ -15,14 +15,24 @@ const createOrUpdate = {
 
 const getProfile = {
   params: Joi.object().keys({
-      userId: Joi.string().required().length(24).hex(),
-    }),
+    userId: Joi.string().required().length(24).hex(),
+  }),
 }
 
 const deleteAddress = {
   params: Joi.object().keys({
     addressId: Joi.string().required().length(24).hex(),
-    }),
+  }),
+}
+
+const updateDefaultAddress = {
+  params: Joi.object().keys({
+    addressId: Joi.string().required().length(24).hex(),
+  }),
+  body: Joi.object().keys({
+    addressId: Joi.string().required(),
+    isDefault: Joi.boolean().required(),
+  }),
 }
 
 const addAddress = {
@@ -40,9 +50,19 @@ const addAddress = {
   }),
 };
 
+const uploadImage = {
+  file: Joi.object()
+    .required()
+    .keys({
+      mimetype: Joi.string().valid('image/jpeg', 'image/png').required(),
+    }),
+};
+
 module.exports = {
   createOrUpdate,
   addAddress,
   getProfile,
-  deleteAddress
+  deleteAddress,
+  updateDefaultAddress,
+  uploadImage
 };

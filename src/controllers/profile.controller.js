@@ -1,5 +1,8 @@
 const profileService = require('../services/profile.service');
 const catchAsync = require('../utils/catchAsync');
+const ApiError = require('../utils/ApiError');
+
+// const cloudinary = require('cloudinary').v2; // Example using Cloudinary
 
 const createOrUpdateProfile = catchAsync(async (req, res) => {
   const profileData = req.body;
@@ -41,9 +44,30 @@ const deleteAddress = catchAsync(async (req, res) => {
   res.sendResponse(updatedProfile, 'Address deleted successfully');
 });
 
+const updateDefaultAddress = catchAsync(async (req, res) => {
+  const userId = req.params.id || req.user.id || '';
+  const { addressId, isDefault } = req.body;
+
+  const result = await profileService.updateDefaultAddress(userId, addressId, isDefault);
+  res.sendResponse(result, 'Default address updated successfully');
+});
+
+const uploadImage = catchAsync(async (req, res) => {
+  if (!req.file) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'No file uploaded');
+  }
+
+  // Upload the file to Cloudinary or any other provider
+  const result = await profileService.uploadImage(req.file);
+
+  res.sendResponse({ imageUrl: result }, 'Image uploaded successfully');
+});
+
 module.exports = {
   createOrUpdateProfile,
   getProfile,
   addAddress,
   deleteAddress,
+  updateDefaultAddress,
+  uploadImage
 };
