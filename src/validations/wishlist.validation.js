@@ -16,7 +16,7 @@ const removeFromWishlist = {
 
 const getAll = {
   params: Joi.object().keys({
-    userId: Joi.string().custom(objectId).optional(),
+    userId: Joi.string().custom(objectId).required(),
   }),
   query: Joi.object().keys({
     sortBy: Joi.string().optional(),
