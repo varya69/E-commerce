@@ -3,6 +3,7 @@ const ApiError = require('../utils/ApiError');
 const db = require('../models/index');
 const Cart = require('../models/cart.model');
 const Product = require('../models/products.model');
+const productService = require('../services/product.service')
 
 // const addToCart = async (userId, productId, quantity = 1) => {
 //   let cart = await Cart.findOne({ userId });
@@ -40,10 +41,12 @@ const Product = require('../models/products.model');
 //   return cart;
 // };
 const add = async (userId, productId, quantity) => {
-  const product = await Product.findById(productId);
-  if (!product) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Product does not exist');
-  }
+  // Verify product stock
+  await productService.verifyProductStock(productId, quantity);
+  // const product = await Product.findById(productId);
+  // if (!product) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Product does not exist');
+  // }
 
   let cart = await Cart.findOne({ userId, productId });
   if (cart) {
@@ -51,11 +54,7 @@ const add = async (userId, productId, quantity) => {
   }
   
   cart = new Cart({ userId, productId, quantity });
-  // const existingProduct = cart.products.find((p) => p.productId.toString() === productId);
-  // if (existingProduct) {
-  // }
 
-  // cart.products.push({ productId, quantity });
   await cart.save();
   return cart;
 };

@@ -34,8 +34,17 @@ const getAll = async (filter, options) => {
   return await db.Product.paginate(filter, options);
 };
 
-const getById = async (id) => {
-  return await Product.findById(id);
+const getById = async (productId) => {
+  // return await Product.findById(id);
+  const product = await Product.findById(productId);
+  if (!product) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
+  return {
+    ...product.toObject(),
+    isInStock: product.stock > 0,
+  };
 };
 
 const deleteById = async (id) => {
@@ -97,11 +106,55 @@ const getProductsWithWishlistStatus = async (userId, options) => {
   };
 };
 
+const getLowStockProducts = async (userId, threshold) => {
+  const products = await Product.find({
+    userId, // Ensure products are filtered by user
+    stock: { $lte: threshold }, // Find products where stock is less than or equal to the threshold
+  });
+
+  return products;
+};
+
+const verifyProductStock = async (productId, quantity) => {
+  const product = await Product.findById(productId);
+  if (!product) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
+  if (product.stock < quantity) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Product is out of stock or insufficient stock');
+  }
+
+  return product;
+};
+
+const getProductWithStockStatus = async (productId) => {
+  const product = await Product.findById(productId);
+  if (!product) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
+  const isInStock = product.stock > 0;
+
+  return {
+    ...product.toObject(),
+    isInStock,
+  };
+};
+
+// const getProductsWithoutReviews = async () => {
+//   const products = await Product.find({ reviews: [] });
+//   return products;
+// };
+
 module.exports = {
   create,
   update,
   getAll,
   getById,
   deleteById,
-  getProductsWithWishlistStatus
+  getProductsWithWishlistStatus,
+  getLowStockProducts,
+  verifyProductStock,
+  getProductWithStockStatus 
 };

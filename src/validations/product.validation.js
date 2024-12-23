@@ -82,10 +82,27 @@ const deleteById = {
   }),
 };
 
+const getLowStockProducts = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId).required(),
+  }),
+  query: Joi.object().keys({
+    threshold: Joi.number().min(1), // Ensure threshold is a positive number
+  }),
+};
+
+const getProductWithStockStatus = {
+  params: Joi.object().keys({
+    productId: Joi.string().custom(objectId).required(),
+  }),
+};
+
 module.exports = {
   create,
   update,
   getAll,
   getById,
   deleteById,
+  getLowStockProducts,
+  getProductWithStockStatus
 };

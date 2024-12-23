@@ -29,7 +29,7 @@ const getAll = catchAsync(async (req, res) => {
 
   const options = {
     sortBy: req.query.sortBy || 'createdAt:desc', // Default to createdAt descending
-    limit: parseInt(req.query.limit, 10) || 10, // Default to 10 results per page
+    limit: parseInt(req.query.limit, 10) || 500, // Default to 10 results per page
     page: parseInt(req.query.page, 10) || 1, // Default to the first page
   };
   
@@ -47,7 +47,10 @@ const getAll = catchAsync(async (req, res) => {
       products.results = products.results.map((product) => ({
         ...product.toObject(), // Convert Mongoose object to plain JS object
         isWishlisted: wishlistedProductIds.includes(product._id.toString()), // Check if product is in the wishlist
+
+        // isInStock: productService.getProductWithStockStatus(product._id),
       }));
+
     }
   } 
 
@@ -118,10 +121,28 @@ const deleteById = catchAsync(async (req, res) => {
   res.sendResponse(result, 'Deleted Successfully', httpStatus.OK);
 });
 
+const getLowStockProducts = catchAsync(async (req, res) => {
+  const userId = req.params.userId; // Get userId from route params
+  const threshold = parseInt(req.query.threshold) || 5; // Default threshold is 5
+
+  // Fetch low stock products
+  const products = await productService.getLowStockProducts(userId, threshold);
+  
+  res.sendResponse(products, "Low stock products fetched successfully", httpStatus.OK);
+});
+
+const getProductWithStockStatus = catchAsync(async (req, res) => {
+  const productId = req.params.productId; // Default threshold is 5
+  const products = await productService.getProductWithStockStatus(productId);
+  res.sendResponse(products, "Product stock fetched successfully", httpStatus.OK);
+});
+
 module.exports = {
   create,
   getAll,
   getById,
   deleteById,
   update,
+  getLowStockProducts,
+  getProductWithStockStatus
 };

@@ -13,7 +13,7 @@ const createOrder = catchAsync(async (req, res) => {
 
 const getOrders = catchAsync(async (req, res) => {
   const userId = req.params.userId || req.user.id || '';
-
+  console.log("userId: " + userId)
   const orders = await orderService.getOrders(userId);
   res.sendResponse(orders, 'Orders fetched successfully');
 });
@@ -25,8 +25,17 @@ const getOrderById = catchAsync(async (req, res) => {
   res.sendResponse(order, 'Order details fetched successfully');
 });
 
+const updateOrderStatus = catchAsync(async (req, res) => {
+  const orderId = req.params.orderId;
+  const status = req.query.status;
+
+  const order = await orderService.updateOrderStatus(orderId, status);
+  res.sendResponse(order, 'Order updated successfully');
+});
+
 module.exports = {
   createOrder,
   getOrders,
   getOrderById,
+  updateOrderStatus
 };

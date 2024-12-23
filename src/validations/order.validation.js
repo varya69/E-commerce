@@ -28,14 +28,24 @@ const getOrderById = {
   }),
 };
 
+const updateOrderStatus = {
+  params: Joi.object().keys({
+    orderId: Joi.string().required().length(24).hex(),
+  }),
+};
+
 const getOrders = {
   params: Joi.object().keys({
     userId: Joi.string().required().length(24).hex(),
+  }),
+  query: Joi.object().keys({
+    status: Joi.string().valid('PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED')
   }),
 };
 
 module.exports = {
   createOrder,
   getOrderById,
-  getOrders
+  getOrders,
+  updateOrderStatus
 };

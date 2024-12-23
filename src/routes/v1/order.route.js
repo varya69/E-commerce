@@ -9,5 +9,6 @@ const router = express.Router();
 router.post('/:userId', auth(), validate(orderValidation.createOrder), orderController.createOrder);
 router.get('/:userId', auth(), validate(orderValidation.getOrders), orderController.getOrders);
 router.get('/getOrderById/:orderId', auth(), validate(orderValidation.getOrderById), orderController.getOrderById);
+router.patch('/updateOrderStatus/:orderId', auth(), validate(orderValidation.getOrderById), orderController.updateOrderStatus);
 
 module.exports = router;

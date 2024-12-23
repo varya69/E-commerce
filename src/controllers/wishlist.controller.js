@@ -48,8 +48,8 @@ const getAll = catchAsync(async (req, res) => {
 
   const options = {
     sortBy: req.query.sortBy, // Default sort order // sort order
-    limit: req.query.limit, // maximum results per page
-    page: req.query.page, // page number
+    limit: req.query.limit || 500, // maximum results per page
+    page: req.query.page || 1, // page number
   };
 
   // const result = await wishlistService.getWishlist(req.params.userId, options);

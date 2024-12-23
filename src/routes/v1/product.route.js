@@ -14,6 +14,8 @@ router.route('/:id').patch(validate(productValidation.update), productController
 
 // Get all products //?sortBy=name:asc&limit=10&page=1
 router.get('/getAllProducts/:userId?', validate(productValidation.getAll), productController.getAll);
+router.get('/getLowStockProducts/:userId?threshold=3', validate(productValidation.getLowStockProducts), productController.getLowStockProducts);
+router.get('/getProductWithStockStatus/:productId', validate(productValidation.getProductWithStockStatus), productController.getProductWithStockStatus );
 
 // Get & delete a single product by product ID
 router
