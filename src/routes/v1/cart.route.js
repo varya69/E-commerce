@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/getAllCarts/:userId?', auth(), validate(cartValidation.getAll), cartController.getAll);
 
-router.route('/').post(auth(), validate(cartValidation.addToCart), cartController.add)
+router.route('/:userId').post(auth(), validate(cartValidation.addToCart), cartController.add)
   // .get(auth(), cartController.get);
 
 router

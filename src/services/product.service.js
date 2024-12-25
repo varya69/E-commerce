@@ -12,7 +12,9 @@ const wishlistService = require('../services/wishlist.service');
  */
 const create = async (userId, productBody) => {
   console.log('productBody', productBody);
-  return await Product.create(productBody);
+  // Attach admin's userId to the product
+  const productData = { ...productBody, createdBy: userId };
+  return await db.Product.create(productData);
 };
 
 const update = async (productId, updateBody) => {
@@ -33,6 +35,7 @@ const update = async (productId, updateBody) => {
 const getAll = async (filter, options) => {
   return await db.Product.paginate(filter, options);
 };
+
 
 const getById = async (productId) => {
   // return await Product.findById(id);

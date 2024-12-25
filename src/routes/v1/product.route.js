@@ -7,14 +7,14 @@ const productValidation = require('../../validations/product.validation');
 const router = express.Router();
 
 // Create a new product
-router.route('/').post(validate(productValidation.create), productController.create);
+router.route('/:userId').post(validate(productValidation.create), productController.create);
 
 // Update a product
 router.route('/:id').patch(validate(productValidation.update), productController.update);
 
 // Get all products //?sortBy=name:asc&limit=10&page=1
 router.get('/getAllProducts/:userId?', validate(productValidation.getAll), productController.getAll);
-router.get('/getLowStockProducts/:userId?threshold=3', validate(productValidation.getLowStockProducts), productController.getLowStockProducts);
+router.get('/getLowStockProducts/:userId?', validate(productValidation.getLowStockProducts), productController.getLowStockProducts);
 router.get('/getProductWithStockStatus/:productId', validate(productValidation.getProductWithStockStatus), productController.getProductWithStockStatus );
 
 // Get & delete a single product by product ID

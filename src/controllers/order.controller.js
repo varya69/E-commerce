@@ -13,6 +13,7 @@ const createOrder = catchAsync(async (req, res) => {
 
 const getOrders = catchAsync(async (req, res) => {
   const userId = req.params.userId || req.user.id || '';
+
   console.log("userId: " + userId)
   const orders = await orderService.getOrders(userId);
   res.sendResponse(orders, 'Orders fetched successfully');

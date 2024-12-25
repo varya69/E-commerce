@@ -17,7 +17,11 @@ const catchAsync = require('../utils/catchAsync'); // Update the path as per you
 // });
 
 const add = catchAsync(async (req, res) => {
-  const result = await wishlistService.add(req.user.id, req.body.productId);
+  const userId = req.params.id || req.user.id;
+  if (!userId) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User Id required');
+  }
+  const result = await wishlistService.add(userId, req.body.productId);
   
   res.status(httpStatus.CREATED).json({
     message: 'Product added to wishlist',
@@ -26,7 +30,7 @@ const add = catchAsync(async (req, res) => {
 });
 
 const remove = catchAsync(async (req, res) => {
-  const wishlistId = req.params.id; // Ensure the ID is passed as a parameter
+  const wishlistId = req.params.wishlistId; // Ensure the ID is passed as a parameter
 
   const result = await wishlistService.remove(wishlistId);
 

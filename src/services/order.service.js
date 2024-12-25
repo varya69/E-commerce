@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const Order = require('../models/order.model');
 const Profile = require('../models/profile.model');
+const User = require('../models/user.model');
 const Product = require('../models/products.model');
 const ApiError = require('../utils/ApiError');
 const productService = require('../services/product.service')
@@ -17,13 +18,27 @@ const productService = require('../services/product.service')
 // };
 
 const validateShippingAddress = async (userId, addressId) => {
+  console.log('validateShippingAddress: user id : ', userId, addressId);
   const profile = await Profile.findOne({ userId, 'addresses._id': addressId });
+  console.log("profile: ", profile)
   if (!profile) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid shipping address');
   }
+
+  return true; // Return true if valid
 };
 
 const createOrder = async (userId, orderData) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  const isValidate = await validateShippingAddress(userId, orderData.shippingAddress);
+  if (!isValidate) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Address is not valid');
+  }
+
   const unavailableItems = [];
   
   // Validate stock for each item
@@ -46,11 +61,6 @@ const createOrder = async (userId, orderData) => {
   for (const item of orderData.orderItems) {
     await adjustStock(item.productId, item.quantity);
   }
-
-  // const isValidate = await validateShippingAddress(userId, orderData.shippingAddress);
-  // if (!isValidate) {
-  //   throw new ApiError(httpStatus.NOT_FOUND, 'Address is not valid');
-  // }
 
   const order = await Order.create({ userId, ...orderData });
   await Profile.findOneAndUpdate(
@@ -138,4 +148,5 @@ module.exports = {
   getOrderById,
   updateOrderStatus,
   adjustStock,
+  validateShippingAddress
 };

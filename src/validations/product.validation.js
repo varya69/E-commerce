@@ -2,6 +2,9 @@ const Joi = require('joi');
 const { objectId } = require('./custom.validation'); // Assuming you have a custom validation for MongoDB ObjectId
 
 const create = {
+  params: Joi.object().keys({
+    userId: Joi.string().custom(objectId).required(),
+  }),
   body: Joi.object().keys({
     category: Joi.string().required(),
     name: Joi.string().required(),
@@ -24,7 +27,7 @@ const create = {
         })
       )
       .optional(),
-    userId: Joi.string().custom(objectId).required(),
+    userId: Joi.string().custom(objectId).optional(),
   }),
 };
 

@@ -6,11 +6,14 @@ const mongoose = require('mongoose');
 
 
 const add = catchAsync(async (req, res) => {
-  const result = await cartService.add(req.user.id, req.body.productId, req.body.quantity || 1);
-  res.status(httpStatus.CREATED).json({
-    message: 'Product added to cart',
-    cart: result,
-  });
+  const userId = req.params.userId || req.user.id;
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid user ID');
+  }
+
+  const result = await cartService.add(userId, req.body.productId, req.body.quantity || 1);
+
+  res.sendResponse(result, 'Product added to cart', httpStatus.OK);
 });
 
 const update = catchAsync(async (req, res) => {
@@ -21,7 +24,6 @@ const update = catchAsync(async (req, res) => {
   const result = await cartService.update(cartId, req.body.quantity);
 
   res.sendResponse(result, 'Cart updated successfully', httpStatus.OK);
-
 });
 
 const remove = catchAsync(async (req, res) => {
@@ -47,7 +49,7 @@ const getAll = catchAsync(async (req, res) => {
   };
 
   // const result = await wishlistService.getWishlist(req.params.userId, options);
-  const result = await cartService.getAll(req.user.id, options);
+  const result = await cartService.getAll(req.params.userId || req.user.id, options);
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Cart not found');
   }
