@@ -1,7 +1,8 @@
 const Joi = require('joi');
 const { objectId } = require('./custom.validation'); // Assuming you have a custom validation for MongoDB ObjectId
 
-const addToCart = {params: Joi.object().keys({
+const addToCart = {
+  params: Joi.object().keys({
     userId: Joi.string().custom(objectId).required(),
   }),
   body: Joi.object().keys({

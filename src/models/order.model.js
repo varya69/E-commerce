@@ -31,7 +31,7 @@ const OrderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["Cash On Delivery", "Card Payment", "UPI", "Net Banking"],
+      enum: ["Cash_On_Delivery", "Card_Payment", "UPI", "Net_Banking"],
       required: true,
     },
     shippingAddress: {

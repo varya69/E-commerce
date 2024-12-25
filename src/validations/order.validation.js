@@ -17,7 +17,7 @@ const createOrder = {
       )
       .required(),
     totalAmount: Joi.number().required(),
-    paymentMethod: Joi.string().valid('Cash On Delivery', 'Card Payment', 'UPI', 'Net Banking').required(),
+    paymentMethod: Joi.string().valid('Cash_On_Delivery', 'Card_Payment', 'UPI', 'Net_Banking').required(),
     shippingAddress: Joi.string().required(),
   }),
 };
