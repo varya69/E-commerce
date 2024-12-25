@@ -51,9 +51,10 @@ const addAddress = {
 };
 
 const uploadImage = {
-  file: Joi.object()
-    .required()
-    .keys({
+  params: Joi.object().keys({
+    userId: Joi.string().required().length(24).hex(),
+  }),
+  file: Joi.object().required().keys({
       mimetype: Joi.string().valid('image/jpeg', 'image/png').required(),
     }),
 };

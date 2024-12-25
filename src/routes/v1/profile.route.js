@@ -14,6 +14,6 @@ router.post('/addresses/:userId', auth(), validate(profileValidation.addAddress)
 router.delete('/addresses/:addressId', auth(), validate(profileValidation.deleteAddress), profileController.deleteAddress);
 router.patch('/update-default-address/:addressId', auth(), validate(profileValidation.updateDefaultAddress), profileController.updateDefaultAddress);
 
-router.post('/upload-image/:userId', auth(), upload.single('image'), profileController.uploadImage);
+router.post('/upload-image/:userId', auth(), upload.single('image'), profileValidation.uploadImage, profileController.uploadImage);
 
 module.exports = router;

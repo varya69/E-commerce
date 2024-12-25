@@ -109,7 +109,6 @@ const uploadImage = async (file) => {
   return `/uploads/images/${file.originalname}`; // Adjust this path to match your server setup
 };
 
-
 module.exports = {
   createOrUpdateProfile,
   getProfile,

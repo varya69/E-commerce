@@ -13,7 +13,6 @@ const add = {
 const remove = {
   params: Joi.object().keys({
     wishlistId: Joi.string().required().length(24).hex(),
-    // productId: Joi.string().required().length(24).hex(),
   }),
 };
 
