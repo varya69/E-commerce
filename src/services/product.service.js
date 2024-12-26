@@ -145,6 +145,25 @@ const getProductWithStockStatus = async (productId) => {
   };
 };
 
+const getRelatedProducts = async (userId, productId) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const product = await Product.findById(productId);
+  if (!product) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
+  // Fetch other products in the same category
+  const relatedProducts = await Product.find({ 
+    category: product.category, 
+    _id: { $ne: productId } 
+  }).limit(5);
+
+  return relatedProducts;
+};
+
 // const getProductsWithoutReviews = async () => {
 //   const products = await Product.find({ reviews: [] });
 //   return products;
@@ -159,5 +178,6 @@ module.exports = {
   getProductsWithWishlistStatus,
   getLowStockProducts,
   verifyProductStock,
-  getProductWithStockStatus 
+  getProductWithStockStatus,
+  getRelatedProducts
 };

@@ -79,6 +79,20 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
+const isAdmin = async (userId) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  if (user.role !== "admin") {
+    throw new ApiError(httpStatus.FORBIDDEN, "Access denied. Admins only.");
+  } 
+
+  return true;
+};
+
 module.exports = {
   createUser,
   queryUsers,
@@ -86,4 +100,5 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
+  isAdmin
 };

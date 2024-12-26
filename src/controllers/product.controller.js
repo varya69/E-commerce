@@ -4,7 +4,10 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const productService = require('../services/product.service');
 const wishlistService = require('../services/wishlist.service');
+const reviewService = require('../services/review.service');
+const userService = require('../services/user.service');
 const db = require('../models/index');
+const Review = require('../models/review.model');
 
 
 const create = catchAsync(async (req, res) => {
@@ -159,8 +162,20 @@ const getAll = catchAsync(async (req, res) => {
 // });
 
 const getById = catchAsync(async (req, res) => {
-  const result = await productService.getById(req.params.productId);
-  res.sendResponse(result, 'Fetched Successfully', httpStatus.OK);
+  const product = await productService.getById(req.params.productId);
+
+  // Fetch product details
+  if (!product) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
+  // Fetch reviews
+  const reviews = await reviewService.getReviewsByProduct(req.params.productId);
+
+  // Fetch related products
+  const relatedProducts = await productService.getRelatedProducts(req.params.productId);
+
+  res.sendResponse(product, reviews, relatedProducts, 'Fetched Successfully', httpStatus.OK);
 });
 
 const deleteById = catchAsync(async (req, res) => {
@@ -184,6 +199,43 @@ const getProductWithStockStatus = catchAsync(async (req, res) => {
   res.sendResponse(products, "Product stock fetched successfully", httpStatus.OK);
 });
 
+const getRelatedProducts = catchAsync(async (req, res) => {
+  const userId = req.params.userId;
+  const productId = req.query.productId;
+  const products = await productService.getRelatedProducts(userId, productId);
+  res.sendResponse(products, "Products fetched successfully", httpStatus.OK);
+});
+
+// review controllers APIs
+const addReview = catchAsync(async (req, res) => {
+  const { rating, review } = req.body;
+  const productId = req.body.productId;
+  const userId = req.params.userId || req.user.id; // Assuming `req.user` is populated after authentication
+
+  const newReview = await reviewService.addReview(userId, productId, { rating, review });
+
+  res.sendResponse(newReview, "Review added successfully", httpStatus.CREATED);
+});
+
+// Get reviews for a product
+const getReviewsByProduct = catchAsync(async (req, res) => {
+  const userId = req.params.userId;
+  const productId = req.query.productId;
+  
+  const reviews = await reviewService.getReviewsByProduct(userId, productId);
+
+  res.sendResponse(reviews, "Reviews fetched successfully", httpStatus.OK);
+});
+
+const getAllReviews = catchAsync(async (req, res) => {
+  const userId = req.params.userId; // Assuming the user is authenticated
+  await userService.isAdmin(userId); // Check if the user is an admin
+
+  const reviews = await Review.find().populate("userId productId");
+  res.sendResponse(reviews, "All reviews fetched successfully", httpStatus.OK);
+});
+
+
 module.exports = {
   create,
   getAll,
@@ -191,5 +243,9 @@ module.exports = {
   deleteById,
   update,
   getLowStockProducts,
-  getProductWithStockStatus
+  getProductWithStockStatus,
+  addReview,
+  getReviewsByProduct,
+  getRelatedProducts,
+  getAllReviews
 };

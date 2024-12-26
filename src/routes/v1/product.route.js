@@ -23,4 +23,9 @@ router
   .get(validate(productValidation.getById), productController.getById)
   .delete(validate(productValidation.deleteById), productController.deleteById);
 
+// Review Routes
+router.post('/:userId/reviews', auth(), validate(productValidation.addReview), productController.addReview);
+router.get('/getReviewsByProduct/:userId/reviews?', auth(), validate(productValidation.getReviewsByProduct), productController.getReviewsByProduct);
+router.get('/getAll/:userId/reviews', auth(), validate(productValidation.getAllReviews), productController.getAllReviews);
+
 module.exports = router;

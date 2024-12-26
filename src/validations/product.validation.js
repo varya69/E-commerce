@@ -100,6 +100,32 @@ const getProductWithStockStatus = {
   }),
 };
 
+const addReview = {
+  params: Joi.object().keys({
+    userId: Joi.string().required().length(24).hex(),
+  }),
+  body: Joi.object().keys({
+    productId: Joi.string().required().length(24).hex(),
+    rating: Joi.number().required().min(1).max(5),
+    review: Joi.string().optional(),
+  }),
+};
+
+const getReviewsByProduct = {
+  params: Joi.object().keys({
+    userId: Joi.string().required().length(24).hex(),
+  }),
+  query: Joi.object().keys({
+    productId: Joi.string().required().length(24).hex(),
+  }),
+};
+
+const getAllReviews = {
+  params: Joi.object().keys({
+    userId: Joi.string().required().length(24).hex(),
+  })
+};
+
 module.exports = {
   create,
   update,
@@ -107,5 +133,8 @@ module.exports = {
   getById,
   deleteById,
   getLowStockProducts,
-  getProductWithStockStatus
+  getProductWithStockStatus,
+  addReview,
+  getAllReviews,
+  getReviewsByProduct,
 };
